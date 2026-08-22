@@ -190,39 +190,37 @@ img{max-width:100%;height:auto}a,button{touch-action:manipulation}</style>
 .card,.product-card,.pickle-card,.pickle-img{transition:none!important;transform:none!important}
 }
 </style>
-<style id="shashi-pickle-watermark">
-.shashi-watermark-layer{
-position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
-background-image:
-url("mango-pickle.png"),
-url("lemon-pickle.png"),
-url("kathal-pickle.png"),
-url("mix-veg-pickle.png"),
-url("red-chilli-bharwa-pickle.png"),
-url("green-chilli-pickle.png");
-background-repeat:no-repeat;
-background-size:105px,95px,110px,100px,90px,100px;
-background-position:8% 18%,88% 30%,15% 68%,84% 78%,48% 12%,55% 88%;
-opacity:.055;
-animation:shashiWatermarkFloat 18s ease-in-out infinite alternate;
-filter:saturate(.7);
-}
-@keyframes shashiWatermarkFloat{
-0%{transform:translate3d(0,0,0) scale(1)}
-50%{transform:translate3d(0,-7px,0) scale(1.015)}
-100%{transform:translate3d(0,6px,0) scale(1)}
-}
-@media (max-width:600px){
-.shashi-watermark-layer{background-size:75px,70px,78px,72px,68px,72px;opacity:.045}
-}
-@media (prefers-reduced-motion:reduce){
-.shashi-watermark-layer{animation:none}
-}
 
+<style id="shashi-pickle-watermark">
+.shashi-watermark-wrap{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.shashi-wm{position:absolute;width:105px;height:105px;object-fit:contain;opacity:.11;filter:saturate(.7);animation:shashiWmFloat 12s ease-in-out infinite alternate}
+.shashi-wm:nth-child(1){left:5%;top:18%;animation-delay:-2s}
+.shashi-wm:nth-child(2){left:82%;top:25%;animation-delay:-6s}
+.shashi-wm:nth-child(3){left:13%;top:68%;animation-delay:-9s}
+.shashi-wm:nth-child(4){left:78%;top:72%;animation-delay:-4s}
+.shashi-wm:nth-child(5){left:43%;top:10%;animation-delay:-7s}
+.shashi-wm:nth-child(6){left:46%;top:84%;animation-delay:-1s}
+.shashi-wm:nth-child(7){left:91%;top:55%;animation-delay:-10s}
+@keyframes shashiWmFloat{
+0%{transform:translate3d(0,0,0) rotate(-2deg)}
+50%{transform:translate3d(0,-10px,0) rotate(2deg)}
+100%{transform:translate3d(0,8px,0) rotate(-1deg)}
+}
 header,main,footer{position:relative;z-index:1}
-</style>
-</head>
-<body><div class="shashi-watermark-layer" aria-hidden="true"></div>
+@media(max-width:600px){
+.shashi-wm{width:72px;height:72px;opacity:.085}
+}
+@media(prefers-reduced-motion:reduce){.shashi-wm{animation:none}}
+</style></head>
+<body><div class="shashi-watermark-wrap" aria-hidden="true">
+<img class="shashi-wm" src="mango-pickle.png" alt="">
+<img class="shashi-wm" src="lemon-pickle.png" alt="">
+<img class="shashi-wm" src="red-chilli-pickle.png" alt="">
+<img class="shashi-wm" src="kathal-pickle.png" alt="">
+<img class="shashi-wm" src="mix-veg-pickle.png" alt="">
+<img class="shashi-wm" src="green-chilli-ginger-pickle.png" alt="">
+<img class="shashi-wm" src="khatta-meetha-pickle.png" alt="">
+</div>
 <header>
 <div class="nav">
 <a class="brand" href="#home">
