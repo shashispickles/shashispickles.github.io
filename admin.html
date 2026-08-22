@@ -81,9 +81,7 @@ onAuthStateChanged(auth,async user=>{
 document.getElementById("logoutBtn").onclick=async()=>{
  try{
   await signOut(auth);
-  document.getElementById("panel").classList.add("hidden");
-  document.getElementById("loginBox").classList.remove("hidden");
-  document.getElementById("loginStatus").textContent="✅ Logout हो गया।";
+  window.location.href="index.html";
  }catch(e){
   document.getElementById("status").textContent="❌ Logout failed: "+e.message;
  }
