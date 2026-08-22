@@ -27,7 +27,12 @@ button{width:100%;border:0;border-radius:12px;padding:14px;background:#2f6b35;co
 
 <div id="panel" class="hidden">
 <div id="who" class="sub"></div><div id="prices"></div>
-<button id="saveBtn">💾 सभी Prices Save करें</button><div id="status" class="status"></div>
+<button id="saveBtn">💾 सभी Prices Save करें</button>
+<div id="status" class="status"></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
+<a id="homeBtn" href="index.html" style="flex:1;text-align:center;text-decoration:none;background:#a51d22;color:white;border-radius:12px;padding:14px;font-size:17px;font-weight:800">🏠 Home</a>
+<button id="logoutBtn" type="button" style="flex:1;margin-top:0;background:#333">🚪 Logout</button>
+</div>
 <a class="back" href="index.html">← Website पर वापस जाएँ</a>
 </div>
 </div></div>
@@ -73,6 +78,16 @@ onAuthStateChanged(auth,async user=>{
   document.getElementById("who").textContent="Logged in: "+user.email;await loadPrices();
  }else if(user){await signOut(auth);}
 });
+document.getElementById("logoutBtn").onclick=async()=>{
+ try{
+  await signOut(auth);
+  document.getElementById("panel").classList.add("hidden");
+  document.getElementById("loginBox").classList.remove("hidden");
+  document.getElementById("loginStatus").textContent="✅ Logout हो गया।";
+ }catch(e){
+  document.getElementById("status").textContent="❌ Logout failed: "+e.message;
+ }
+};
 document.getElementById("saveBtn").onclick=async()=>{
  const user=auth.currentUser;
  if(!user || user.email.toLowerCase()!==ADMIN){alert("Admin login required");return;}
