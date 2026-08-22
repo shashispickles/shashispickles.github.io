@@ -242,11 +242,33 @@ to{opacity:0;transform:translate(-50%,-50%) scale(4)}
 }
 </style>
 
-<style id="shashi-pickle-blast-robust">
-.shashi-watermark-wrap{z-index:9990!important;pointer-events:auto!important}
-.shashi-watermark-wrap .shashi-wm{pointer-events:auto!important;cursor:pointer!important;position:absolute!important}
-.shashi-blast-flash{position:fixed;z-index:99999;width:26px;height:26px;border-radius:50%;background:rgba(255,190,40,.95);box-shadow:0 0 0 8px rgba(220,40,20,.35),0 0 30px rgba(255,120,0,.8);pointer-events:none;transform:translate(-50%,-50%) scale(.2);animation:shashiFlash .55s ease-out forwards}
-@keyframes shashiFlash{to{opacity:0;transform:translate(-50%,-50%) scale(3.2)}}
+
+
+<style id="shashi-pickle-scatter-style">
+.shashi-pickle-piece{
+ position:fixed;z-index:100000;pointer-events:none;
+ width:12px;height:9px;border-radius:45% 55% 50% 50%;
+ box-shadow:0 1px 2px rgba(0,0,0,.25);
+ animation:shashiPickleScatter .9s cubic-bezier(.12,.72,.22,1) forwards;
+}
+.shashi-pickle-piece.small{width:8px;height:6px}
+.shashi-pickle-piece.big{width:16px;height:11px}
+@keyframes shashiPickleScatter{
+ 0%{opacity:1;transform:translate(-50%,-50%) rotate(0deg) scale(.45)}
+ 18%{opacity:1;transform:translate(calc(-50% + var(--dx1)),calc(-50% + var(--dy1))) rotate(55deg) scale(1)}
+ 100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--rot)) scale(.72)}
+}
+.shashi-pickle-splash{
+ position:fixed;z-index:99999;pointer-events:none;
+ width:20px;height:20px;border-radius:50%;
+ background:rgba(255,175,30,.95);
+ box-shadow:0 0 0 7px rgba(190,35,25,.28),0 0 28px rgba(255,130,0,.65);
+ transform:translate(-50%,-50%) scale(.2);
+ animation:shashiPickleSplash .6s ease-out forwards;
+}
+@keyframes shashiPickleSplash{
+ to{opacity:0;transform:translate(-50%,-50%) scale(4)}
+}
 </style>
 </head>
 <body><div class="shashi-watermark-wrap" aria-hidden="true">
@@ -488,40 +510,61 @@ if(document.readyState==='loading'){
 })();
 </script>
 
-<script id="shashi-pickle-blast-robust-js">
+
+
+<script id="shashi-pickle-scatter-js">
 (function(){
-function start(){
+function init(){
  var wrap=document.querySelector('.shashi-watermark-wrap');
- if(!wrap || wrap.dataset.robustBlast) return;
- wrap.dataset.robustBlast='1';
+ if(!wrap || wrap.dataset.scatterReady) return;
+ wrap.dataset.scatterReady='1';
+
  wrap.addEventListener('click',function(e){
    var jar=e.target.closest('.shashi-wm');
    if(!jar) return;
    e.preventDefault(); e.stopPropagation();
-   var r=jar.getBoundingClientRect(), x=r.left+r.width/2, y=r.top+r.height/2;
-   jar.classList.remove('shashi-blasting'); void jar.offsetWidth; jar.classList.add('shashi-blasting');
 
-   var flash=document.createElement('span');
-   flash.className='shashi-blast-flash';
-   flash.style.left=x+'px'; flash.style.top=y+'px';
-   document.body.appendChild(flash);
-   setTimeout(function(){flash.remove()},600);
+   var r=jar.getBoundingClientRect();
+   var x=r.left+r.width/2, y=r.top+r.height/2;
 
-   for(var i=0;i<18;i++){
+   var splash=document.createElement('span');
+   splash.className='shashi-pickle-splash';
+   splash.style.left=x+'px'; splash.style.top=y+'px';
+   document.body.appendChild(splash);
+   setTimeout(function(){splash.remove()},650);
+
+   var pieces=28;
+   var colors=['#a94318','#c96516','#e0a52a','#6f8d18','#7c9d20','#9c3516','#d48b18'];
+   for(var i=0;i<pieces;i++){
      var p=document.createElement('span');
-     p.className='shashi-blast-piece';
+     p.className='shashi-pickle-piece '+(i%7===0?'big':(i%3===0?'small':''));
      p.style.left=x+'px'; p.style.top=y+'px';
-     var a=Math.PI*2*i/18, d=55+Math.random()*115;
-     p.style.setProperty('--dx',Math.cos(a)*d+'px');
-     p.style.setProperty('--dy',Math.sin(a)*d+'px');
-     p.style.color=['#b51f1f','#2d6b2d','#e3a51c'][i%3];
+     p.style.background=colors[i%colors.length];
+
+     var a=(Math.PI*2*i/pieces)+(Math.random()-.5)*.45;
+     var d=65+Math.random()*155;
+     var d1=d*.25;
+     p.style.setProperty('--dx1',(Math.cos(a)*d1)+'px');
+     p.style.setProperty('--dy1',(Math.sin(a)*d1)+'px');
+     p.style.setProperty('--dx',(Math.cos(a)*d)+'px');
+     p.style.setProperty('--dy',(Math.sin(a)*d+35+Math.random()*45)+'px');
+     p.style.setProperty('--rot',((Math.random()*720)-360)+'deg');
      document.body.appendChild(p);
-     setTimeout(function(el){return function(){el.remove()}}(p),850);
+     setTimeout(function(el){return function(){el.remove()}}(p),1000);
    }
-   setTimeout(function(){jar.classList.remove('shashi-blasting')},900);
+
+   jar.style.transition='opacity .25s ease, transform .25s ease';
+   jar.style.opacity='0';
+   jar.style.transform='scale(.2) rotate(18deg)';
+   setTimeout(function(){
+     jar.style.opacity='';
+     jar.style.transform='';
+   },1100);
  });
 }
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+if(document.readyState==='loading'){
+ document.addEventListener('DOMContentLoaded',init,{once:true});
+}else init();
 })();
 </script>
 </body>
