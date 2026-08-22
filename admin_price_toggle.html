@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shashi's Pickles — Admin</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans Devanagari",sans-serif;background:#fffaf0;color:#29231e}
+.wrap{max-width:760px;margin:35px auto;padding:18px}.box{background:white;border-radius:22px;padding:28px;box-shadow:0 10px 35px #0001}
+.logo{display:block;width:150px;height:150px;object-fit:contain;margin:0 auto 10px}h1{text-align:center;color:#a51d22;margin:5px 0}.sub{text-align:center;color:#6b625a;margin-bottom:25px}
+label{display:block;font-weight:800;margin:15px 0 6px}.row{display:grid;grid-template-columns:1fr 150px;gap:12px;align-items:center}.row input{width:100%;padding:12px;border:1px solid #ddd0c0;border-radius:10px;font-size:18px;font-weight:700}.price-toggle{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700}.price-toggle input{width:18px;height:18px}
+button{width:100%;border:0;border-radius:12px;padding:14px;background:#2f6b35;color:white;font-size:17px;font-weight:800;cursor:pointer;margin-top:22px}
+.status{text-align:center;margin-top:15px;font-weight:700}.back{display:block;text-align:center;margin-top:18px;color:#a51d22;text-decoration:none;font-weight:700}
+.login input{width:100%;padding:13px;border:1px solid #ddd0c0;border-radius:10px;font-size:16px;margin-bottom:10px}.login button{background:#a51d22;margin-top:8px}
+.hidden{display:none}@media(max-width:600px){.row{grid-template-columns:1fr 120px}.box{padding:20px}}
+</style>
+</head>
+<body><div class="wrap"><div class="box">
+<img class="logo" src="shashis-pickles-logo.jpeg" alt="Shashi's Pickles"><h1>Shashi's Pickles Admin</h1>
+<div class="sub">सिर्फ अधिकृत Admin ही कीमत बदल सकता है</div>
+
+<div id="loginBox" class="login">
+<label>Admin Email</label><input id="email" type="email" placeholder="shashikalatripathi8@gmail.com" value="shashikalatripathi8@gmail.com">
+<label>Password</label><input id="password" type="password" placeholder="Firebase password">
+<button id="loginBtn">Admin Login</button><div id="loginStatus" class="status"></div>
+</div>
+
+<div id="panel" class="hidden">
+<div id="who" class="sub"></div><div id="prices"></div>
+<button id="saveBtn">💾 सभी Prices Save करें</button><div id="status" class="status"></div>
+<a class="back" href="index.html">← Website पर वापस जाएँ</a>
+</div>
+</div></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+const firebaseConfig={
+ apiKey:"PASTE_YOUR_FIREBASE_API_KEY",
+ authDomain:"shashispickles.firebaseapp.com",
+ projectId:"shashispickles",
+ storageBucket:"shashispickles.firebasestorage.app",
+ messagingSenderId:"PASTE_YOUR_MESSAGING_SENDER_ID",
+ appId:"PASTE_YOUR_FIREBASE_APP_ID"
+};
+const ADMIN="shashikalatripathi8@gmail.com";
+const app=initializeApp(firebaseConfig), auth=getAuth(app), db=getFirestore(app);
+
+const list=[
+["mango","Mango Pickle","199"],["lemon","Lemon Pickle","179"],["redChilli","Red Chilli Pickle","219"],
+["kathal","Kathal Ka Achar","199"],["mixVeg","Mix Veg Pickle","189"],["greenGinger","Green Chilli Ginger","209"],["khattaMeetha","Khatta Meetha Achar","189"]
+];
+
+function makeFields(data={}){
+ document.getElementById("prices").innerHTML=list.map(x=>`
+ <label>${x[1]}</label><div class="row"><span>Price / 500g</span><input type="number" min="0" id="p_${x[0]}" value="${Number(data[x[0]] ?? x[2])}"></div><label class="price-toggle"><input type="checkbox" id="e_${x[0]}" ${data[x[0]+"_enabled"] !== false ? "checked" : ""}> Price दिखाएँ</label>`).join("");
+}
+async function loadPrices(){
+ const s=await getDoc(doc(db,"settings","prices")); makeFields(s.exists()?s.data():{});
+}
+document.getElementById("loginBtn").onclick=async()=>{
+ const email=document.getElementById("email").value.trim().toLowerCase(), pass=document.getElementById("password").value;
+ if(email!==ADMIN){document.getElementById("loginStatus").textContent="❌ यह Admin email नहीं है।";return;}
+ try{await signInWithEmailAndPassword(auth,email,pass);}
+ catch(e){document.getElementById("loginStatus").textContent="❌ Login failed: "+e.message;}
+};
+onAuthStateChanged(auth,async user=>{
+ if(user && user.email.toLowerCase()===ADMIN){
+  document.getElementById("loginBox").classList.add("hidden");document.getElementById("panel").classList.remove("hidden");
+  document.getElementById("who").textContent="Logged in: "+user.email;await loadPrices();
+ }else if(user){await signOut(auth);}
+});
+document.getElementById("saveBtn").onclick=async()=>{
+ const user=auth.currentUser;
+ if(!user || user.email.toLowerCase()!==ADMIN){alert("Admin login required");return;}
+ const out={};list.forEach(x=>{out[x[0]]=Number(document.getElementById("p_"+x[0]).value)||0;out[x[0]+"_enabled"]=document.getElementById("e_"+x[0]).checked;});
+ try{await setDoc(doc(db,"settings","prices"),out,{merge:true});document.getElementById("status").textContent="✅ Prices सफलतापूर्वक save हो गईं।";}
+ catch(e){document.getElementById("status").textContent="❌ Save failed: "+e.message;}
+};
+</script>
+</body>
+</html>
