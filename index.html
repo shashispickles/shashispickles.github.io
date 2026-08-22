@@ -241,6 +241,13 @@ animation:shashiRing .55s ease-out forwards;
 to{opacity:0;transform:translate(-50%,-50%) scale(4)}
 }
 </style>
+
+<style id="shashi-pickle-blast-robust">
+.shashi-watermark-wrap{z-index:9990!important;pointer-events:auto!important}
+.shashi-watermark-wrap .shashi-wm{pointer-events:auto!important;cursor:pointer!important;position:absolute!important}
+.shashi-blast-flash{position:fixed;z-index:99999;width:26px;height:26px;border-radius:50%;background:rgba(255,190,40,.95);box-shadow:0 0 0 8px rgba(220,40,20,.35),0 0 30px rgba(255,120,0,.8);pointer-events:none;transform:translate(-50%,-50%) scale(.2);animation:shashiFlash .55s ease-out forwards}
+@keyframes shashiFlash{to{opacity:0;transform:translate(-50%,-50%) scale(3.2)}}
+</style>
 </head>
 <body><div class="shashi-watermark-wrap" aria-hidden="true">
 <img class="shashi-wm" src="mango-pickle.png" alt="">
@@ -478,6 +485,43 @@ document.querySelectorAll('.shashi-wm').forEach(function(jar){
 if(document.readyState==='loading'){
  document.addEventListener('DOMContentLoaded',initBlast,{once:true});
 }else initBlast();
+})();
+</script>
+
+<script id="shashi-pickle-blast-robust-js">
+(function(){
+function start(){
+ var wrap=document.querySelector('.shashi-watermark-wrap');
+ if(!wrap || wrap.dataset.robustBlast) return;
+ wrap.dataset.robustBlast='1';
+ wrap.addEventListener('click',function(e){
+   var jar=e.target.closest('.shashi-wm');
+   if(!jar) return;
+   e.preventDefault(); e.stopPropagation();
+   var r=jar.getBoundingClientRect(), x=r.left+r.width/2, y=r.top+r.height/2;
+   jar.classList.remove('shashi-blasting'); void jar.offsetWidth; jar.classList.add('shashi-blasting');
+
+   var flash=document.createElement('span');
+   flash.className='shashi-blast-flash';
+   flash.style.left=x+'px'; flash.style.top=y+'px';
+   document.body.appendChild(flash);
+   setTimeout(function(){flash.remove()},600);
+
+   for(var i=0;i<18;i++){
+     var p=document.createElement('span');
+     p.className='shashi-blast-piece';
+     p.style.left=x+'px'; p.style.top=y+'px';
+     var a=Math.PI*2*i/18, d=55+Math.random()*115;
+     p.style.setProperty('--dx',Math.cos(a)*d+'px');
+     p.style.setProperty('--dy',Math.sin(a)*d+'px');
+     p.style.color=['#b51f1f','#2d6b2d','#e3a51c'][i%3];
+     document.body.appendChild(p);
+     setTimeout(function(el){return function(){el.remove()}}(p),850);
+   }
+   setTimeout(function(){jar.classList.remove('shashi-blasting')},900);
+ });
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
 </script>
 </body>
