@@ -297,9 +297,12 @@ async function loadPrices(){
    const snap=await getDoc(doc(db,"settings","prices"));
    const prices=snap.exists()?snap.data():{};
    Object.keys(defaults).forEach(id=>{
+     const el=document.getElementById(id);
      const value=Number(prices[id]);
      const finalPrice=Number.isFinite(value)&&value>=0?value:defaults[id];
-     document.getElementById(id).innerHTML="₹"+finalPrice+" <small>/ 500g</small>";
+     const enabled=prices[id+"_enabled"] !== false;
+     el.innerHTML="₹"+finalPrice+" <small>/ 500g</small>";
+     el.style.display=enabled ? "" : "none";
    });
  }catch(e){
    console.log("Price load:",e);
