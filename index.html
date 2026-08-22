@@ -192,7 +192,7 @@ img{max-width:100%;height:auto}a,button{touch-action:manipulation}</style>
 </style>
 <style id="shashi-pickle-watermark">
 .shashi-watermark-layer{
-position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;
+position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
 background-image:
 url("mango-pickle.png"),
 url("lemon-pickle.png"),
@@ -218,6 +218,8 @@ filter:saturate(.7);
 @media (prefers-reduced-motion:reduce){
 .shashi-watermark-layer{animation:none}
 }
+
+header,main,footer{position:relative;z-index:1}
 </style>
 </head>
 <body><div class="shashi-watermark-layer" aria-hidden="true"></div>
