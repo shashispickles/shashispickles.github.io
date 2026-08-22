@@ -211,7 +211,37 @@ header,main,footer{position:relative;z-index:1}
 .shashi-wm{width:72px;height:72px;opacity:.45}
 }
 @media(prefers-reduced-motion:reduce){.shashi-wm{animation:none}}
-</style></head>
+</style>
+<style id="shashi-pickle-blast-style">
+.shashi-wm{cursor:pointer;transition:filter .2s ease,transform .2s ease}
+.shashi-wm:hover{filter:saturate(1.15) drop-shadow(0 4px 10px rgba(180,40,20,.18))}
+.shashi-wm.shashi-blasting{animation:shashiJarBlast .48s ease-out forwards!important}
+@keyframes shashiJarBlast{
+0%{opacity:.45;transform:scale(1) rotate(0)}
+25%{opacity:.9;transform:scale(1.18) rotate(-5deg)}
+100%{opacity:0;transform:scale(.25) rotate(18deg)}
+}
+.shashi-blast-piece{
+position:fixed;width:8px;height:8px;border-radius:50%;
+pointer-events:none;z-index:9999;
+background:currentColor;
+animation:shashiPieceBlast .72s cubic-bezier(.12,.8,.2,1) forwards;
+}
+@keyframes shashiPieceBlast{
+0%{opacity:1;transform:translate3d(0,0,0) scale(1)}
+100%{opacity:0;transform:translate3d(var(--dx),var(--dy),0) rotate(360deg) scale(.15)}
+}
+.shashi-blast-ring{
+position:fixed;width:18px;height:18px;border:3px solid rgba(190,35,25,.75);
+border-radius:50%;pointer-events:none;z-index:9998;
+transform:translate(-50%,-50%) scale(.2);
+animation:shashiRing .55s ease-out forwards;
+}
+@keyframes shashiRing{
+to{opacity:0;transform:translate(-50%,-50%) scale(4)}
+}
+</style>
+</head>
 <body><div class="shashi-watermark-wrap" aria-hidden="true">
 <img class="shashi-wm" src="mango-pickle.png" alt="">
 <img class="shashi-wm" src="lemon-pickle.png" alt="">
@@ -407,5 +437,48 @@ nodes.forEach(function(el){io.observe(el)});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initShashiMotion,{once:true});
 else initShashiMotion();
 })();
-</script></body>
+</script>
+<script id="shashi-pickle-blast-js">
+(function(){
+function initBlast(){
+document.querySelectorAll('.shashi-wm').forEach(function(jar){
+ if(jar.dataset.blastReady) return;
+ jar.dataset.blastReady='1';
+ jar.addEventListener('click',function(e){
+   if(jar.classList.contains('shashi-blasting')) return;
+   var rect=jar.getBoundingClientRect();
+   var x=rect.left+rect.width/2, y=rect.top+rect.height/2;
+   jar.classList.add('shashi-blasting');
+
+   var ring=document.createElement('span');
+   ring.className='shashi-blast-ring';
+   ring.style.left=x+'px'; ring.style.top=y+'px';
+   document.body.appendChild(ring);
+   setTimeout(function(){ring.remove()},650);
+
+   for(var i=0;i<14;i++){
+     var p=document.createElement('span');
+     p.className='shashi-blast-piece';
+     p.style.left=x+'px'; p.style.top=y+'px';
+     var a=(Math.PI*2*i/14)+(Math.random()-.5)*.35;
+     var d=45+Math.random()*95;
+     p.style.setProperty('--dx',Math.cos(a)*d+'px');
+     p.style.setProperty('--dy',Math.sin(a)*d+'px');
+     p.style.color=i%3===0?'#b51f1f':(i%3===1?'#2d6b2d':'#e3a51c');
+     document.body.appendChild(p);
+     setTimeout(function(el){return function(){el.remove()}}(p),800);
+   }
+
+   setTimeout(function(){
+     jar.classList.remove('shashi-blasting');
+   },900);
+ });
+});
+}
+if(document.readyState==='loading'){
+ document.addEventListener('DOMContentLoaded',initBlast,{once:true});
+}else initBlast();
+})();
+</script>
+</body>
 </html>
